@@ -207,12 +207,15 @@ export default function Home() {
       <Navbar
         onAboutClick={() => setShowAbout(true)}
         onHomeClick={() => setShowAbout(false)}
+        isAboutActive={showAbout}
       />
-      <SearchBar
-        onSearch={setSearchQuery}
-        onGradeFilter={setSelectedGrade}
-        selectedGrade={selectedGrade}
-      />
+      {!showAbout && (
+        <SearchBar
+          onSearch={setSearchQuery}
+          onGradeFilter={setSelectedGrade}
+          selectedGrade={selectedGrade}
+        />
+      )}
       <div className="py-8">
         {showAbout ? (
           <section
