@@ -1,17 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
   onGradeFilter: (grade: number | null) => void;
   selectedGrade: number | null;
+  isDark: boolean;
+  onToggleTheme: () => void;
 }
 
 export default function SearchBar({
   onSearch,
   onGradeFilter,
   selectedGrade,
+  isDark,
+  onToggleTheme,
 }: SearchBarProps) {
   const [query, setQuery] = useState('');
 
@@ -61,30 +65,50 @@ export default function SearchBar({
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => onGradeFilter(null)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              selectedGrade === null
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Svi razredi
-          </button>
-          {grades.map((grade) => (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
             <button
-              key={grade}
-              onClick={() => onGradeFilter(grade)}
+              onClick={() => onGradeFilter(null)}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                selectedGrade === grade
+                selectedGrade === null
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {grade} razred
+              Svi razredi
             </button>
-          ))}
+            {grades.map((grade) => (
+              <button
+                key={grade}
+                onClick={() => onGradeFilter(grade)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  selectedGrade === grade
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {grade} razred
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="flex items-center"
+            aria-label={
+              isDark ? 'Prebaci na svijetli prikaz' : 'Prebaci na tamni prikaz'
+            }
+          >
+            <span className="relative h-6 w-11 rounded-full bg-gray-300 shadow-inner dark:bg-gray-600">
+              <span
+                className={`absolute top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[11px] shadow transition-transform ${
+                  isDark ? 'translate-x-5' : 'translate-x-0.5'
+                }`}
+              >
+                {isDark ? '🌙' : '☀️'}
+              </span>
+            </span>
+          </button>
         </div>
       </div>
     </div>
