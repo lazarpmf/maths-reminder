@@ -19,6 +19,7 @@ export async function createLesson(
   description: string,
   grade: number,
   pdf_path: string,
+  tags: string[],
   accessToken?: string
 ): Promise<Lesson> {
   const supabase = await createClient(accessToken);
@@ -33,12 +34,20 @@ export async function createLesson(
       description,
       grade,
       pdf_path,
+      tags,
       created_by: user.id,
     })
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.message?.toLowerCase().includes('tags')) {
+      throw new Error(
+        'Kolona "tags" ne postoji u bazi. Pokreni SQL iz SUPABASE_SETUP.md.'
+      );
+    }
+    throw new Error(error.message);
+  }
   return data;
 }
 
@@ -48,6 +57,7 @@ export async function updateLesson(
   description: string,
   grade: number,
   pdf_path: string,
+  tags: string[],
   accessToken?: string
 ): Promise<Lesson> {
   const supabase = await createClient(accessToken);
@@ -62,12 +72,20 @@ export async function updateLesson(
       description,
       grade,
       pdf_path,
+      tags,
     })
     .eq('id', id)
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.message?.toLowerCase().includes('tags')) {
+      throw new Error(
+        'Kolona "tags" ne postoji u bazi. Pokreni SQL iz SUPABASE_SETUP.md.'
+      );
+    }
+    throw new Error(error.message);
+  }
   return data;
 }
 

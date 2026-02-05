@@ -13,6 +13,7 @@ CREATE TABLE lessons (
   description TEXT NOT NULL,
   grade INTEGER NOT NULL CHECK (grade >= 6 AND grade <= 9),
   pdf_path TEXT NOT NULL,
+  tags TEXT[] NOT NULL DEFAULT ARRAY['#matematika'],
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   created_by UUID REFERENCES auth.users(id)
@@ -70,6 +71,17 @@ CREATE TRIGGER update_lessons_updated_at
   BEFORE UPDATE ON lessons
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+```
+
+### 1a. Add tags to existing lessons table (if already created)
+
+```sql
+ALTER TABLE lessons
+ADD COLUMN IF NOT EXISTS tags TEXT[] NOT NULL DEFAULT ARRAY['#matematika'];
+
+UPDATE lessons
+SET tags = ARRAY['#matematika']
+WHERE tags IS NULL OR array_length(tags, 1) IS NULL;
 ```
 
 ### 2. Create visits table

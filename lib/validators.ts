@@ -11,6 +11,10 @@ export const lessonSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   grade: z.number().int().min(6).max(9),
   pdf_path: z.string().min(1, 'PDF is required'),
+  tags: z
+    .array(z.string().min(1))
+    .min(1, 'At least one tag is required')
+    .max(10, 'Maximum 10 tags allowed'),
 });
 
 export type LessonFormData = z.infer<typeof lessonSchema>;

@@ -9,6 +9,8 @@ interface CardGridProps {
   onEdit?: (lesson: Lesson) => void;
   onDelete?: (lesson: Lesson) => void;
   isAdmin?: boolean;
+  isLoading?: boolean;
+  emptyMessage?: string;
 }
 
 export default function CardGrid({
@@ -17,11 +19,21 @@ export default function CardGrid({
   onEdit,
   onDelete,
   isAdmin = false,
+  isLoading = false,
+  emptyMessage = 'No lessons found.',
 }: CardGridProps) {
+  if (isLoading) {
+    return (
+      <div className="py-16 text-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
+      </div>
+    );
+  }
+
   if (lessons.length === 0) {
     return (
       <div className="py-12 text-center">
-        <p className="text-gray-500">No lessons found.</p>
+        <p className="text-gray-500">{emptyMessage}</p>
       </div>
     );
   }

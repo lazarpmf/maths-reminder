@@ -40,6 +40,7 @@ export default function Home() {
   const [loginError, setLoginError] = useState('');
   const [notification, setNotification] = useState<NotificationState | null>(null);
   const [showAbout, setShowAbout] = useState(false);
+  const [isLoadingLessons, setIsLoadingLessons] = useState(true);
   const aboutRef = useRef<HTMLElement | null>(null);
 
   const ITEMS_PER_PAGE = 20;
@@ -80,10 +81,13 @@ export default function Home() {
 
   async function loadLessons() {
     try {
+      setIsLoadingLessons(true);
       const data = await getLessons();
       setLessons(data);
     } catch (error) {
       console.error('Failed to load lessons:', error);
+    } finally {
+      setIsLoadingLessons(false);
     }
   }
 
@@ -106,9 +110,13 @@ export default function Home() {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((l) =>
-        l.title.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter((l) => {
+        const tags = l.tags && l.tags.length > 0 ? l.tags : ['#matematika'];
+        return (
+          l.title.toLowerCase().includes(query) ||
+          tags.some((tag) => tag.toLowerCase().includes(query))
+        );
+      });
     }
 
     setFilteredLessons(filtered);
@@ -140,7 +148,13 @@ export default function Home() {
   }
 
   async function handleSaveLesson(
-    data: { title: string; description: string; grade: number; pdf_path: string }
+    data: {
+      title: string;
+      description: string;
+      grade: number;
+      pdf_path: string;
+      tags: string[];
+    }
   ) {
     try {
       // Get access token from current session
@@ -154,6 +168,7 @@ export default function Home() {
           data.description,
           data.grade,
           data.pdf_path,
+          data.tags,
           accessToken
         );
         setNotification({
@@ -166,6 +181,7 @@ export default function Home() {
           data.description,
           data.grade,
           data.pdf_path,
+          data.tags,
           accessToken
         );
         setNotification({
@@ -287,6 +303,12 @@ export default function Home() {
           <>
             <CardGrid
               lessons={paginatedLessons}
+              isLoading={isLoadingLessons}
+              emptyMessage={
+                searchQuery.trim()
+                  ? 'Tražena lekcija nije pronađena.'
+                  : 'Nema lekcija.'
+              }
               onCardClick={setSelectedLesson}
               onEdit={(lesson) => {
                 setEditingLesson(lesson);

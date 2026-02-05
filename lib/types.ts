@@ -4,6 +4,7 @@ export interface Lesson {
   description: string;
   grade: number;
   pdf_path: string;
+  tags: string[];
   created_at: string;
   updated_at: string;
   created_by?: string | null;

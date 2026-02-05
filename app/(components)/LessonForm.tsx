@@ -19,6 +19,9 @@ export default function LessonForm({
   const [title, setTitle] = useState(lesson?.title || '');
   const [description, setDescription] = useState(lesson?.description || '');
   const [grade, setGrade] = useState<number>(lesson?.grade || 6);
+  const [tagsInput, setTagsInput] = useState(
+    lesson?.tags?.length ? lesson.tags.join(', ') : ''
+  );
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,11 +46,19 @@ export default function LessonForm({
         return;
       }
 
+      const tags = normalizeTags(tagsInput);
+      if (tags.length > 10) {
+        setError('Možete dodati najviše 10 tagova');
+        setIsSubmitting(false);
+        return;
+      }
+
       const formData = {
         title: title.trim(),
         description: description.trim(),
         grade,
         pdf_path: pdfPath,
+        tags,
       };
 
       // Validate title word count
@@ -59,18 +70,29 @@ export default function LessonForm({
       }
 
       // Validate other fields
-      if (!formData.title || !formData.description || !formData.pdf_path) {
+      if (
+        !formData.title ||
+        !formData.description ||
+        !formData.pdf_path ||
+        formData.tags.length === 0
+      ) {
         setError('All fields are required');
         setIsSubmitting(false);
         return;
       }
 
+      lessonSchema.parse(formData);
+
       await onSave(formData);
     } catch (err: any) {
-      if (err.errors) {
+      if (err?.errors) {
         setError(err.errors.map((e: any) => e.message).join(', '));
+      } else if (typeof err?.message === 'string' && err.message.trim()) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
       } else {
-        setError(err.message || 'Failed to save lesson');
+        setError('Greška prilikom čuvanja lekcije');
       }
     } finally {
       setIsSubmitting(false);
@@ -86,6 +108,17 @@ export default function LessonForm({
     }
   }
 
+  function normalizeTags(input: string): string[] {
+    const raw = input
+      .split(/[\s,]+/)
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+      .map((tag) => (tag.startsWith('#') ? tag : `#${tag}`));
+
+    const unique = Array.from(new Set(raw));
+    return unique.length > 0 ? unique : ['#matematika'];
+  }
+
   const wordCount = title.split(/\s+/).filter((w) => w.length > 0).length;
 
   return (
@@ -94,7 +127,7 @@ export default function LessonForm({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-xl"
+        className="flex w-full max-w-2xl max-h-[90vh] flex-col overflow-hidden rounded-lg bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 border-b border-gray-200 bg-white p-4">
@@ -102,7 +135,7 @@ export default function LessonForm({
             {lesson ? 'Promjena lekcije' : 'Dodati karticu'}
           </h2>
         </div>
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto p-6">
           <div className="mb-4">
             <label className="mb-1 block text-sm font-medium text-gray-700">
               Naslov <span className="text-red-500">*</span>
@@ -152,6 +185,24 @@ export default function LessonForm({
               <option value={8}>8 razred</option>
               <option value={9}>9 razred</option>
             </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Tagovi <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
+              placeholder="#matematika, #algebra, #razlomci"
+              className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Unesi do 10 tagova, odvojeno zarezom ili razmakom. Ako ne uneseš
+              ništa, biće dodan tag #matematika.
+            </p>
           </div>
 
           <div className="mb-4">

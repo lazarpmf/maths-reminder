@@ -17,6 +17,8 @@ export default function Card({
   onDelete,
   isAdmin = false,
 }: CardProps) {
+  const tags =
+    lesson.tags && lesson.tags.length > 0 ? lesson.tags : ['#matematika'];
   const titleWords = lesson.title.split(/\s+/);
   const displayTitle =
     titleWords.length > 50
@@ -55,9 +57,13 @@ export default function Card({
       <h3 className="mb-2 text-lg font-semibold text-gray-900 line-clamp-2">
         {displayTitle}
       </h3>
-      <p className="text-sm text-gray-600 line-clamp-3">
-        {lesson.description}
-      </p>
+      <div className="mt-3 flex flex-wrap gap-1 text-xs text-gray-500">
+        {tags.slice(0, 10).map((tag) => (
+          <span key={tag} className="rounded bg-gray-100 px-2 py-0.5">
+            {tag}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
