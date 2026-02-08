@@ -41,7 +41,6 @@ export default function Home() {
   const [notification, setNotification] = useState<NotificationState | null>(null);
   const [showAbout, setShowAbout] = useState(false);
   const [isLoadingLessons, setIsLoadingLessons] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const aboutRef = useRef<HTMLElement | null>(null);
 
   const ITEMS_PER_PAGE = 20;
@@ -79,21 +78,6 @@ export default function Home() {
     setSelectedLesson(null);
     aboutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [showAbout]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme');
-    const prefersDark =
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const nextIsDark = stored ? stored === 'dark' : prefersDark;
-    setIsDarkMode(nextIsDark);
-    document.documentElement.classList.toggle('dark', nextIsDark);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDarkMode);
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
 
   async function loadLessons() {
     try {
@@ -241,13 +225,12 @@ export default function Home() {
         onHomeClick={() => setShowAbout(false)}
         isAboutActive={showAbout}
       />
+      <h1 className="sr-only">Matematički podsjetnik</h1>
       {!showAbout && (
         <SearchBar
           onSearch={setSearchQuery}
           onGradeFilter={setSelectedGrade}
           selectedGrade={selectedGrade}
-          isDark={isDarkMode}
-          onToggleTheme={() => setIsDarkMode((value) => !value)}
         />
       )}
       <div className="py-8">

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "http://localhost:3000";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -13,8 +17,55 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Matematički podsjetnik",
-  description: "Matematičke lekcije i podsjetnici",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Matematički podsjetnik",
+    template: "%s | Matematički podsjetnik",
+  },
+  description:
+    "Matematičke lekcije, podsjetnici i PDF materijali za učenike osnovne škole.",
+  keywords: [
+    "matematika",
+    "lekcije",
+    "podsjetnik",
+    "osnovna škola",
+    "formule",
+    "zadaci",
+  ],
+  applicationName: "Matematički podsjetnik",
+  creator: "Profesor Lazar",
+  publisher: "Matematički podsjetnik",
+  category: "education",
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    title: "Matematički podsjetnik",
+    description:
+      "Matematičke lekcije, podsjetnici i PDF materijali za učenike osnovne škole.",
+    url: siteUrl,
+    siteName: "Matematički podsjetnik",
+    locale: "sr_RS",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Matematički podsjetnik",
+    description:
+      "Matematičke lekcije, podsjetnici i PDF materijali za učenike osnovne škole.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({

@@ -1,28 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
   onGradeFilter: (grade: number | null) => void;
   selectedGrade: number | null;
-  isDark: boolean;
-  onToggleTheme: () => void;
 }
 
 export default function SearchBar({
   onSearch,
   onGradeFilter,
   selectedGrade,
-  isDark,
-  onToggleTheme,
 }: SearchBarProps) {
   const [query, setQuery] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(query);
-  };
 
   const grades = [6, 7, 8, 9];
 
@@ -65,7 +56,7 @@ export default function SearchBar({
             </button>
           )}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => onGradeFilter(null)}
@@ -91,24 +82,6 @@ export default function SearchBar({
               </button>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={onToggleTheme}
-            className="flex items-center"
-            aria-label={
-              isDark ? 'Prebaci na svijetli prikaz' : 'Prebaci na tamni prikaz'
-            }
-          >
-            <span className="relative h-6 w-11 rounded-full bg-gray-300 shadow-inner dark:bg-gray-600">
-              <span
-                className={`absolute top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[11px] shadow transition-transform ${
-                  isDark ? 'translate-x-5' : 'translate-x-0.5'
-                }`}
-              >
-                {isDark ? '🌙' : '☀️'}
-              </span>
-            </span>
-          </button>
         </div>
       </div>
     </div>

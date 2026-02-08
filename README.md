@@ -44,6 +44,7 @@ A Next.js application for managing and viewing mathematical lesson cards with PD
      ```
      NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
      NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_publishable_key
+     NEXT_PUBLIC_SITE_URL=https://your-domain.example
      ```
 
 5. Run the development server:
