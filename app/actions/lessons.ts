@@ -1,17 +1,28 @@
 'use server';
 
+import { unstable_cache, revalidateTag } from 'next/cache';
 import { createClient } from '@/lib/supabaseServer';
 import type { Lesson } from '@/lib/types';
 
-export async function getLessons(): Promise<Lesson[]> {
+const LESSON_LIST_COLUMNS =
+  'id, title, description, grade, pdf_path, tags, created_at, updated_at, created_by';
+
+async function fetchLessonsFromDb(): Promise<Lesson[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('lessons')
-    .select('*')
+    .select(LESSON_LIST_COLUMNS)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
   return data || [];
+}
+
+export async function getLessons(): Promise<Lesson[]> {
+  return unstable_cache(fetchLessonsFromDb, ['lessons-list'], {
+    revalidate: 60,
+    tags: ['lessons'],
+  })();
 }
 
 export async function createLesson(
@@ -48,6 +59,7 @@ export async function createLesson(
     }
     throw new Error(error.message);
   }
+  revalidateTag('lessons', 'max');
   return data;
 }
 
@@ -86,6 +98,7 @@ export async function updateLesson(
     }
     throw new Error(error.message);
   }
+  revalidateTag('lessons', 'max');
   return data;
 }
 
@@ -113,4 +126,5 @@ export async function deleteLesson(
   const { error } = await supabase.from('lessons').delete().eq('id', id);
 
   if (error) throw error;
+  revalidateTag('lessons', 'max');
 }
